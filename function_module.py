@@ -34,7 +34,7 @@ def generate_graph(n, seed, type_of_problem):
                 new_graph.add_edge(j, i % (n + 1), weight=random.randrange(1, 1000))
 
     elif type_of_problem == "full":
-        
+
         tmp = nx.complete_graph(range(1, n + 1))
 
         for (node1, node2, data) in tmp.edges(data=True):
@@ -43,7 +43,7 @@ def generate_graph(n, seed, type_of_problem):
         return tmp
 
     else:
-   
+
         node_list = []
         for i in range(1, n + 1):
             x = random.randrange(1, 1000)
@@ -57,40 +57,42 @@ def generate_graph(n, seed, type_of_problem):
                     continue
                 number = int(math.sqrt((out_edge[1] - to_edge[1]) ** 2 + (out_edge[2] - to_edge[2]) ** 2))
                 new_graph.add_edge(out_edge[0], to_edge[0], weight=number)
-    
+
     return new_graph
 
-def OPT2(G,start):
-    
+
+def OPT2(G, start):
     permutation = start
-    
+
     change = -1
     while change < 0:
-        
-        current_distance = calc_dist(G,permutation)
+
+        current_distance = calc_dist(G, permutation)
         end_permutation = permutation
         change = 0
         for i in range(1, len(permutation) - 1):
             for j in range(i + 2, len(permutation) - 1):
-                
+
                 new_permutation = inversion(permutation, i, j)
-                new_f = calc_dist(G,new_permutation)
-            
+                new_f = calc_dist(G, new_permutation)
+
                 if new_f < current_distance:
                     change = new_f - current_distance
                     current_distance = new_f
                     end_permutation = new_permutation
-        
+
         if change < 0:
             permutation = end_permutation
-            
+
     return permutation, calc_dist(G, permutation)
+
 
 def calc_dist(graph, permutation):
     dis = 0
     for i in range(0, len(permutation)):
         dis = dis + graph[permutation[i]][permutation[(i + 1) % len(permutation)]]['weight']
     return dis
+
 
 def inversion(permutation, m, n):
     new_permutation = []
@@ -101,5 +103,3 @@ def inversion(permutation, m, n):
     for i in range(n + 1, len(permutation)):
         new_permutation.append(permutation[i])
     return new_permutation
-
-
