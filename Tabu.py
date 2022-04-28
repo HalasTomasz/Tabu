@@ -36,29 +36,6 @@ def calc_inversion_dist(graph, permutation, m, n):
     return dist
 
 
-def swap_move(permutation, i, j):
-    permutation[i], permutation[j] = permutation[j], permutation[i]
-    return permutation
-
-
-def calc_swap_dist(graph, permutation, m, n):
-    dist = 0
-    for i in range(0, m - 1):
-        dist += graph[permutation[i]][permutation[(i + 1) % len(permutation)]]['weight']
-    for i in range(m + 1, n - 1):
-        dist += graph[permutation[i]][permutation[(i + 1) % len(permutation)]]['weight']
-    for i in range(n + 1, len(permutation)):
-        dist += graph[permutation[i]][permutation[(i + 1) % len(permutation)]]['weight']
-
-    dist += graph[permutation[m - 1]][permutation[n]]['weight']
-    dist += graph[permutation[n]][permutation[(m + 1) % len(permutation)]]['weight']
-
-    dist += graph[permutation[n - 1]][permutation[m]]['weight']
-    dist += graph[permutation[m]][permutation[(n + 1) % len(permutation)]]['weight']
-
-    return dist
-
-
 def find(graph, permutation):
     tabu_structure = {}
 
@@ -73,19 +50,23 @@ def find(graph, permutation):
 
 
 def find_neighbour_min(graph, permutation, tabu_list):
+    new_solution = permutation
     new_current_solution_cost = sys.maxsize
     current_i = 0
     current_j = 0
 
     for i in range(0, graph.number_of_nodes()):
         for j in range(i + 1, graph.number_of_nodes()):
-            current_solution_cost = calc_swap_dist(graph, permutation, i, j)
+            permutation[i], permutation[j] = permutation[j], permutation[i]
+            current_solution_cost = calc_dist(graph, permutation)
+            permutation[i], permutation[j] = permutation[j], permutation[i]
             if current_solution_cost < new_current_solution_cost and {i, j} not in tabu_list:
+                new_solution = permutation
                 new_current_solution_cost = current_solution_cost
                 current_i = i
                 current_j = j
 
-    return new_current_solution_cost, current_i, current_j
+    return new_solution, new_current_solution_cost, current_i, current_j
 
 
 def tabu_search(permutation, graph, number_of_iterations, tabu_size, n_opt=1):
@@ -96,12 +77,10 @@ def tabu_search(permutation, graph, number_of_iterations, tabu_size, n_opt=1):
     best_solution_ever = solution
 
     while count <= number_of_iterations:
-        new_current_solution_cost, current_i, current_j = find_neighbour_min(graph, solution, tabu_list)
+        solution, new_current_solution_cost, current_i, current_j = find_neighbour_min(graph, solution, tabu_list)
         print(count, ": ", new_current_solution_cost)
 
         if new_current_solution_cost != sys.maxsize:
-            solution = swap_move(solution, current_i, current_j)
-            print(count, ": ", calc_dist(graph, solution))
             tabu_list.append({current_i, current_j})
             if len(tabu_list) > tabu_size:
                 tabu_list.pop(0)
@@ -110,7 +89,7 @@ def tabu_search(permutation, graph, number_of_iterations, tabu_size, n_opt=1):
                 best_cost = new_current_solution_cost
         else:
             current_i, current_j = tabu_list[-1][0], tabu_list[-1][1]
-            solution = swap_move(solution, current_i, current_j)
+            solution[current_i], solution[current_j] = solution[current_j], solution[current_i]
         count += 1
     # while count <= number_of_iterations:
     #     neighborhood = find(graph, solution)
