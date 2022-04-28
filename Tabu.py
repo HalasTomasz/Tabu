@@ -80,7 +80,7 @@ def find_neighbour_min(graph, permutation, tabu_list):
     for i in range(0, graph.number_of_nodes()):
         for j in range(i + 1, graph.number_of_nodes()):
             current_solution_cost = calc_swap_dist(graph, permutation, i, j)
-            if current_solution_cost < new_current_solution_cost and (i, j) not in tabu_list:
+            if current_solution_cost < new_current_solution_cost and {i, j} not in tabu_list:
                 new_current_solution_cost = current_solution_cost
                 current_i = i
                 current_j = j
@@ -102,14 +102,15 @@ def tabu_search(permutation, graph, number_of_iterations, tabu_size, n_opt=1):
         if new_current_solution_cost != sys.maxsize:
             solution = swap_move(solution, current_i, current_j)
             print(count, ": ", calc_dist(graph, solution))
-            tabu_list.append((current_i, current_j))
+            tabu_list.append({current_i, current_j})
             if len(tabu_list) > tabu_size:
                 tabu_list.pop(0)
             if new_current_solution_cost < best_cost:
                 best_solution_ever = solution
                 best_cost = new_current_solution_cost
         else:
-            print("ups")
+            current_i, current_j = tabu_list[-1][0], tabu_list[-1][1]
+            solution = swap_move(solution, current_i, current_j)
         count += 1
     # while count <= number_of_iterations:
     #     neighborhood = find(graph, solution)
