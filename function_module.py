@@ -61,6 +61,41 @@ def generate_graph(n, seed, type_of_problem):
     return new_graph
 
 
+def nearest_neighbour(graph, source):
+    route = [source]
+    vertices_left = [value for value in graph.nodes() if value not in route]
+    vertex = source
+
+    total = 0
+    while vertices_left:
+        dist = 0
+        for target in vertices_left:
+            if dist == 0 or dist > graph[source][target]['weight']:
+                dist = graph[source][target]['weight']
+                vertex = target
+        route.append(vertex)
+        vertices_left.remove(vertex)
+        # print("source: ", source, ", target: ", vertex, ", distance: ", dist)
+        source = vertex
+        total += dist
+
+    # print("source: ", source, ", target: ", route[0], ", distance: ", graph[source][route[0]]['weight'])
+    total += graph[source][route[0]]['weight']
+    return route, total
+
+
+def extended_nearest_neighbour(graph):
+    total = 0
+    final_sol = []
+    for source in graph.nodes():
+        solution = nearest_neighbour(graph, source)
+        if total == 0 or solution[1] < total:
+            total = solution[1]
+            final_sol = solution
+
+    return final_sol[0], final_sol[1]
+
+
 def OPT2(G, start):
     permutation = start
 
