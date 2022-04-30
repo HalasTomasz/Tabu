@@ -32,7 +32,7 @@ if __name__ == '__main__':
     # print(function_module.OPT2(graph, start))
 
     start = function_module.extended_nearest_neighbour(graph)[0]
-    print(Tabu.tabu_search(start, graph, 500, len(start), "invert"))
+    print(Tabu.tabu_search(start, graph, 5, len(start)))
     # print(Tabu.tabu_search(start, graph, math.pow(len(start), 2), len(start)))
 
     # """
