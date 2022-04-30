@@ -97,11 +97,11 @@ def tabu_search(permutation, graph, number_of_iterations, tabu_size, n_opt=1):
 
     while count <= number_of_iterations:
         new_current_solution_cost, current_i, current_j = find_neighbour_min(graph, solution, tabu_list)
-        print(count, ": ", new_current_solution_cost)
+        #print(count, ": ", new_current_solution_cost)
 
         if new_current_solution_cost != sys.maxsize:
             solution = swap_move(solution, current_i, current_j)
-            print(count, ": ", calc_dist(graph, solution))
+            #print(count, ": ", calc_dist(graph, solution))
             tabu_list.append({current_i, current_j})
             if len(tabu_list) > tabu_size:
                 tabu_list.pop(0)
