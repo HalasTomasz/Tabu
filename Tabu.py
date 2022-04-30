@@ -70,9 +70,11 @@ def tabu_search(permutation, graph, number_of_iterations, tabu_size, neighbourho
         elif neighbourhood_type == "invert":
             solution, new_current_solution_cost, current_i, current_j = find_neighbour_min(graph, solution, tabu_list,
                                                                                            inversion)
-        print(count, ": ", new_current_solution_cost)
+        #print(count, ": ", new_current_solution_cost)
 
         if new_current_solution_cost != sys.maxsize:
+            solution = swap_move(solution, current_i, current_j)
+            #print(count, ": ", calc_dist(graph, solution))
             tabu_list.append({current_i, current_j})
             if len(tabu_list) > tabu_size:
                 tabu_list.pop(0)
