@@ -15,13 +15,13 @@ def read_graph_input(file):
     new_graph = problem.get_graph()
     new_graph = new_graph.to_directed()
 
-    opt = tsplib95.load('bays29.opt.tour')
+    opt = tsplib95.load('berlin52.opt.tour')
     print(problem.trace_tours(opt.tours))
     return new_graph
 
 
 if __name__ == '__main__':
-    graph = read_graph_input('bays29.tsp')
+    graph = read_graph_input('berlin52.tsp')
     """
     Create random soluton to begin with
     """
@@ -32,7 +32,8 @@ if __name__ == '__main__':
     # print(function_module.OPT2(graph, start))
 
     start = function_module.extended_nearest_neighbour(graph)[0]
-    print(Tabu.tabu_search(start, graph, 500, len(start), "invert"))
+    print(function_module.extended_nearest_neighbour(graph)[1])
+    print(Tabu.tabu_search(start, graph, 500, len(start), "swap"))
     # print(Tabu.tabu_search(start, graph, math.pow(len(start), 2), len(start)))
 
     # """
