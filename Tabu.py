@@ -73,7 +73,6 @@ def tabu_search(permutation, graph, number_of_iterations, tabu_size, neighbourho
         #print(count, ": ", new_current_solution_cost)
 
         if new_current_solution_cost != sys.maxsize:
-            solution = swap_move(solution, current_i, current_j)
             #print(count, ": ", calc_dist(graph, solution))
             tabu_list.append({current_i, current_j})
             if len(tabu_list) > tabu_size:
