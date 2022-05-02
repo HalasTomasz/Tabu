@@ -8,6 +8,7 @@ import copy
 import tsplib95
 import time
 import testing
+import plotting
 
 
 def read_graph_input(file):
@@ -46,4 +47,5 @@ if __name__ == '__main__':
     # Create random using OPT2
     # """
     # start,_ = function_module.OPT2(graph)
-    testing.test_auto_generate()
+    # testing.test_auto_generate()
+    plotting.plotting("Second_test_gen.json")
