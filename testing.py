@@ -7,17 +7,18 @@ import json
 import time
 import Tabu
 import numpy as np
+
 """
 def test from given path 
 use it to open and solve tests
 """
 
-def test(path):
-    
+
+def test(path, neighbourhood_type):
     print(path)
-    
+
     collector = []
-    size_of_tabu_table = [10,50,100,200,500,1000]
+    size_of_tabu_table = [10, 50, 100, 200, 500, 1000]
     node_NN = 1
     file_number = 0
     for filename in os.listdir(path):
@@ -39,78 +40,88 @@ def test(path):
             graph = graph.to_directed()
 
             if answer:
-                path_to_tour = path_to_folder + "/" + filename.split('.')[0] + ".opt.tour" + "/" + filename.split('.')[0] + ".opt.tour"
+                path_to_tour = path_to_folder + "/" + filename.split('.')[0] + ".opt.tour" + "/" + filename.split('.')[
+                    0] + ".opt.tour"
                 opt = tsplib95.load(path_to_tour)
                 print("Rozwiązanie optymalne: ", problem.trace_tours(opt.tours))
             else:
                 opt = "None"
-                
+
             for size in size_of_tabu_table:
-                 
+                """
+                 EXTENDED TABU SEARCH WITH INV
                  """
-                 EXTENTED TABU SEARCH WITH INV
+
+                starting_permutation = function_module.extended_nearest_neighbour(graph)[0]  # Staring Permutation
+
+                start = time.process_time()
+
+                permutation, cost = Tabu.tabu_search(starting_permutation, graph, size, len(starting_permutation),
+                                                     "invert")  # Run Tabu
+
+                end = time.process_time()
+
+                collector.append(DataGraph(filename, 'tabu_ex_inv', end - start, cost, str(permutation), size, "None"))
+
+                """
+                 EXTENDED TABU SEARCH WITH SWAP
                  """
-             
-                 starting_permuation = function_module.extended_nearest_neighbour(graph)[0]  # Staring Permuataion
-                 
-                 start = time.process_time()
-                 
-             
-                 permutation, cost = Tabu.tabu_search(starting_permuation, graph, size, len(starting_permuation)) # Run Tabu
-                 
-                 end = time.process_time()
-                 
-                 collector.append(DataGraph(filename,'tabu_ex_inv',end-start, cost,str(permutation),size,"None"))
-                 
-                 ## Dodałbys prosze tabu ze swapem?
+
+                starting_permutation = function_module.extended_nearest_neighbour(graph)[0]  # Staring Permutation
+
+                start = time.process_time()
+
+                permutation, cost = Tabu.tabu_search(starting_permutation, graph, size, len(starting_permutation),
+                                                     "swap")  # Run Tabu
+
+                end = time.process_time()
+
+                collector.append(DataGraph(filename, 'tabu_ex_swap', end - start, cost, str(permutation), size, "None"))
+
+                """
+                 OPT2 [1,2,3....n] TABU SEARCH WITH INV/SWAP
                  """
-                 EXTENTED TABU SEARCH WITH SWAP
+
+                opt2Permutation = list(range(1, graph.number_of_nodes() + 1))
+
+                starting_permutation = function_module.OPT2(graph, opt2Permutation)[0]
+
+                start = time.process_time()
+
+                permutation, cost = Tabu.tabu_search(starting_permutation, graph, size, len(starting_permutation),
+                                                     neighbourhood_type)
+
+                end = time.process_time()
+
+                collector.append(DataGraph(filename, 'tabu_opt_' + neighbourhood_type, end - start, cost,
+                                           str(permutation), size, "None"))
+
+                """
+                 OPT2 [random] TABU SEARCH WITH INV/SWAP
                  """
-                       
-                 
-                 
-                 """
-                 OPT2 [1,2,3....n] TABU SEARCH WITH SWAP/INV?
-                 """
-                 
-                 opt2Permuation = list(range(1, graph.number_of_nodes() + 1))
-                 
-                 starting_permuation = function_module.OPT2(graph,opt2Permuation)[0]
-                 
-                 start = time.process_time()
-                 
-                 permutation, cost = Tabu.tabu_search(starting_permuation, graph, size, len(starting_permuation))
-                 
-                   
-                 end = time.process_time()
-                 
-                 collector.append(DataGraph(filename,'tabu_opt_inv',end-start, cost,str(permutation),size,"None"))
-                 
-                 """
-                 OPT2 [random] TABU SEARCH WITH SWAP/INV?
-                 """
-                 
-                 opt2Permuation = list(range(1, graph.number_of_nodes() + 1))
-                 np.random.shuffle(opt2Permuation)
-                 
-                 starting_permuation = function_module.OPT2(graph,opt2Permuation)[0]
-                 
-                 start = time.process_time()
-                 
-                 permutation, cost = Tabu.tabu_search(starting_permuation, graph, size, len(starting_permuation))
-                 
-                 end = time.process_time()
-                 
-                 collector.append(DataGraph(filename,'tabu_opt_r_swap>>>>',end-start, cost,str(permutation),size,"None")) ## ZOBACZ TU!!
-                 
-                 """
+
+                opt2Permutation = list(range(1, graph.number_of_nodes() + 1))
+                np.random.shuffle(opt2Permutation)
+
+                starting_permutation = function_module.OPT2(graph, opt2Permutation)[0]
+
+                start = time.process_time()
+
+                permutation, cost = Tabu.tabu_search(starting_permutation, graph, size, len(starting_permutation),
+                                                     neighbourhood_type)
+
+                end = time.process_time()
+
+                collector.append(DataGraph(filename, 'tabu_opt_r_' + neighbourhood_type, end - start, cost,
+                                           str(permutation), size, "None"))
+
+                """
                  My random tabu search
                  """
-          
-                
+
     try:
         with open('C:/Users/denev/TSP/files7.json', 'w') as fout:
-            json.dump(collector , fout)
+            json.dump(collector, fout)
     except IOError:
         pass
     finally:
@@ -122,11 +133,11 @@ dic to save data to JSON
 """
 
 
-def DataGraph(Type, func, time, solution, permutation,tabu, opt ):
+def DataGraph(Type, func, t, solution, permutation, tabu, opt):
     Dic = {
         'Type': Type,
         'function': func,
-        'time': time,
+        'time': t,
         'solution': solution,
         'size_of tabu': tabu,
         'optimal_solution': opt
@@ -143,82 +154,97 @@ tests on auto generated graph
 """
 
 
-def test_auto_generate(seed=100):
-    types = ['sym', 'asym', 'full' 'eu']  
+def test_auto_generate(seed=100, neighbourhood_type="invert"):
+    types = ['sym', 'asym', 'full' 'eu']
     collection = []
-    size_of_tabu_table = [10,50,100,200,500,1000]
-    
-    for i in range(1,10):
-        
+    size_of_tabu_table = [10, 50, 100, 200, 500, 1000]
+
+    for i in range(1, 10):
+
         for n in range(10, 300, 20):
-            
+
             for graph_type in types:
-                
+
                 for size in size_of_tabu_table:
-                    
                     """
-                    EXTENTED TABU SEARCH WITH INV
+                    EXTENDED TABU SEARCH WITH INV
                     """
-                
-                    graph = function_module.generate_graph(n, seed, graph_type) #Create graph
-                    
-                    starting_permuation = function_module.extended_nearest_neighbour(graph)[0]  # Staring Permuataion
-                    
+
+                    graph = function_module.generate_graph(n, seed, graph_type)  # Create graph
+
+                    starting_permutation = function_module.extended_nearest_neighbour(graph)[0]  # Staring Permutation
+
                     start = time.process_time()
-                    
-                
-                    permutation, cost = Tabu.tabu_search(starting_permuation, graph, size, len(starting_permuation)) # Run Tabu
-                    
+
+                    permutation, cost = Tabu.tabu_search(starting_permutation, graph, size,
+                                                         len(starting_permutation), "invert")  # Run Tabu
+
                     end = time.process_time()
-                    
-                    collection.append(DataGraph(graph_type,'tabu_ex_inv',end-start, cost,str(permutation),size,"None"))
-                    
-                    ## Dodałbys prosze tabu ze swapem?
+
+                    collection.append(
+                        DataGraph(graph_type, 'tabu_ex_inv', end - start, cost, str(permutation), size, "None"))
+
                     """
-                    EXTENTED TABU SEARCH WITH SWAP
+                    EXTENDED TABU SEARCH WITH SWAP
                     """
-                         
-                    
-                    
-                    """
-                    OPT2 [1,2,3....n] TABU SEARCH WITH SWAP/INV?
-                    """
-                    
-                    opt2Permuation = list(range(1, graph.number_of_nodes() + 1))
-                    
-                    starting_permuation = function_module.OPT2(graph,opt2Permuation)[0]
-                    
+
+                    graph = function_module.generate_graph(n, seed, graph_type)  # Create graph
+
+                    starting_permutation = function_module.extended_nearest_neighbour(graph)[0]  # Staring Permutation
+
                     start = time.process_time()
-                    
-                    permutation, cost = Tabu.tabu_search(starting_permuation, graph, size, len(starting_permuation))
-                    
-                      
+
+                    permutation, cost = Tabu.tabu_search(starting_permutation, graph, size,
+                                                         len(starting_permutation), "swap")  # Run Tabu
+
                     end = time.process_time()
-                    
-                    collection.append(DataGraph(graph_type,'tabu_opt_inv',end-start, cost,str(permutation),size,"None"))
-                    
+
+                    collection.append(
+                        DataGraph(graph_type, 'tabu_ex_swap', end - start, cost, str(permutation), size, "None"))
+
                     """
-                    OPT2 [random] TABU SEARCH WITH SWAP/INV?
+                    OPT2 [1,2,3....n] TABU SEARCH WITH INV/SWAP
                     """
-                    
-                    opt2Permuation = list(range(1, graph.number_of_nodes() + 1))
-                    np.random.shuffle(opt2Permuation)
-                    
-                    starting_permuation = function_module.OPT2(graph,opt2Permuation)[0]
-                    
+
+                    opt2Permutation = list(range(1, graph.number_of_nodes() + 1))
+
+                    starting_permutation = function_module.OPT2(graph, opt2Permutation)[0]
+
                     start = time.process_time()
-                    
-                    permutation, cost = Tabu.tabu_search(starting_permuation, graph, size, len(starting_permuation))
-                    
+
+                    permutation, cost = Tabu.tabu_search(starting_permutation, graph, size, len(starting_permutation),
+                                                         neighbourhood_type)
+
                     end = time.process_time()
-                    
-                    collection.append(DataGraph(graph_type,'tabu_opt_r_swap>>>>',end-start, cost,str(permutation),size,"None")) ## ZOBACZ TU!!
-                    
+
+                    collection.append(
+                        DataGraph(graph_type, 'tabu_opt_' + neighbourhood_type, end - start, cost,str(permutation),
+                                  size, "None"))
+
+
+                    """
+                    OPT2 [random] TABU SEARCH WITH INV/SWAP
+                    """
+
+                    opt2Permutation = list(range(1, graph.number_of_nodes() + 1))
+                    np.random.shuffle(opt2Permutation)
+
+                    starting_permutation = function_module.OPT2(graph, opt2Permutation)[0]
+
+                    start = time.process_time()
+
+                    permutation, cost = Tabu.tabu_search(starting_permutation, graph, size, len(starting_permutation),
+                                                         neighbourhood_type)
+
+                    end = time.process_time()
+
+                    collection.append(
+                        DataGraph(graph_type, 'tabu_opt_r_' + neighbourhood_type, end - start, cost, str(permutation),
+                                  size, "None"))
+
                     """
                     My random tabu search
                     """
-    
-
 
     try:
         file = open("Final_test2", "w")
