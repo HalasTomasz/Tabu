@@ -2,6 +2,7 @@ import os
 import function_module
 import tsplib95
 import networkx as nx
+import copy
 import glob
 import json
 import time
@@ -157,11 +158,11 @@ tests on auto generated graph
 def test_auto_generate(seed=100, neighbourhood_type="invert"):
     types = ['sym', 'asym', 'full' 'eu']
     collection = []
-    size_of_tabu_table = [10, 50, 100, 200, 500, 1000]
+    size_of_tabu_table = [10, 50, 100, 200] # 500 and 10000
 
-    for i in range(1, 10):
+    for i in range(1): # 10
 
-        for n in range(10, 300, 20):
+        for n in range(10, 100, 20): # 300 
 
             for graph_type in types:
 
@@ -218,7 +219,7 @@ def test_auto_generate(seed=100, neighbourhood_type="invert"):
                     end = time.process_time()
 
                     collection.append(
-                        DataGraph(graph_type, 'tabu_opt_' + neighbourhood_type, end - start, cost,str(permutation),
+                        DataGraph(graph_type, 'tabu_opt_inv' + neighbourhood_type, end - start, cost,str(permutation),
                                   size, "None"))
 
 
@@ -239,15 +240,19 @@ def test_auto_generate(seed=100, neighbourhood_type="invert"):
                     end = time.process_time()
 
                     collection.append(
-                        DataGraph(graph_type, 'tabu_opt_r_' + neighbourhood_type, end - start, cost, str(permutation),
+                        DataGraph(graph_type, 'tabu_opt_inv' + neighbourhood_type, end - start, cost, str(permutation),
                                   size, "None"))
 
                     """
                     My random tabu search
                     """
+                    start = function_module.extended_nearest_neighbour(graph)[0]
+                    permutation, cost  = Tabu.tabu_search_random(copy.copy(start), graph, size, len(starting_permutation),
+                                                         neighbourhood_type)
+                    
 
     try:
-        file = open("Final_test2", "w")
+        file = open("First_test_gen", "w")
         json.dump(collection, file, indent=3)
     except IOError:
         pass

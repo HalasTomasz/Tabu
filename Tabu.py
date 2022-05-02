@@ -57,7 +57,7 @@ def find_neighbour_min(graph, permutation, tabu_list, neighbourhood_type):
     return new_solution, new_current_solution_cost, current_i, current_j
 
 def find_neighbour_min_random(graph, permutation, tabu_list, neighbourhood_type):
-    new_solution = copy.copy(permutation)
+    new_solution = copy.copy(permutation) #jak zminiałem tablice to new solution tez sie zmieniał
     new_current_solution_cost = sys.maxsize
     current_i = 0
     current_j = 0

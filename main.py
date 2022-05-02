@@ -7,6 +7,7 @@ import Tabu
 import copy
 import tsplib95
 import time
+import testing
 
 
 def read_graph_input(file):
@@ -22,7 +23,7 @@ def read_graph_input(file):
 
 
 if __name__ == '__main__':
-    graph = read_graph_input('bays29.tsp')
+    #graph = read_graph_input('bays29.tsp')
     """
     Create random soluton to begin with
     """
@@ -32,16 +33,17 @@ if __name__ == '__main__':
     # start = list(start)
     # print(function_module.OPT2(graph, start))
 
-    start = function_module.extended_nearest_neighbour(graph)[0]
-    print(function_module.extended_nearest_neighbour(graph)[1])
-    print(start)
+    #start = function_module.extended_nearest_neighbour(graph)[0]
+    #print(function_module.extended_nearest_neighbour(graph)[1])
+    #print(start)
     #print(Tabu.tabu_search(start, graph, 1000, 10, "swap"))
-    print(start)
-    print(Tabu.tabu_search_random(copy.copy(start), graph, 50, 10, "swap"))
-    print(start)
+    #print(start)
+    #print(Tabu.tabu_search_random(copy.copy(start), graph, 50, 10, "swap"))
+    #print(start)
     #print(Tabu.tabu_search(start, graph, math.pow(len(start), 2), len(start)))
 
     # """
     # Create random using OPT2
     # """
     # start,_ = function_module.OPT2(graph)
+    testing.test_auto_generate()
