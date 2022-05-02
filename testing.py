@@ -259,7 +259,7 @@ def test_auto_generate(seed=100, neighbourhood_type="invert"):
                     
             print("finish " + str(n) )
     try:
-        file = open("Second_test_gen", "w")
+        file = open("Final_result", "w")
         json.dump(collection, file, indent=3)
     except IOError:
         pass
