@@ -12,69 +12,34 @@ def calc_dist(graph, permutation):
     return dis
 
 
-def inversion(permutation, m, n):
-    new_permutation = []
-    for i in range(0, m + 1):
-        new_permutation.append(permutation[i])
-    for i in range(n, m, -1):
-        new_permutation.append(permutation[i])
-    for i in range(n + 1, len(permutation)):
-        new_permutation.append(permutation[i])
-    return new_permutation
+def inversion(permutation, i, j):
+    while i < j:
+        swap(permutation, i, j)
+        i += 1
+        j -= 1
+    return permutation
 
 
-def calc_inversion_dist(graph, permutation, m, n):
-    dist = 0
-    for i in range(0, m - 1):
-        dist += graph[permutation[i]][permutation[(i + 1) % len(permutation)]]['weight']
-    for i in range(n, m, -1):
-        dist += graph[permutation[i]][permutation[(i + 1) % len(permutation)]]['weight']
-    for i in range(n + 1, len(permutation)):
-        dist += graph[permutation[i]][permutation[(i + 1) % len(permutation)]]['weight']
-
-    dist += graph[permutation[m - 1]][permutation[n]]['weight']
-    dist += graph[permutation[m]][permutation[(n + 1) % len(permutation)]]['weight']
-
-    return dist
-
-
-def swap_move(permutation, i, j):
+def swap(permutation, i, j):
     permutation[i], permutation[j] = permutation[j], permutation[i]
     return permutation
 
 
-def calc_swap_dist(graph, permutation, m, n):
-    dist = 0
-    for i in range(0, m - 1):
-        dist += graph[permutation[i]][permutation[(i + 1) % len(permutation)]]['weight']
-    for i in range(m + 1, n - 1):
-        dist += graph[permutation[i]][permutation[(i + 1) % len(permutation)]]['weight']
-    for i in range(n + 1, len(permutation)):
-        dist += graph[permutation[i]][permutation[(i + 1) % len(permutation)]]['weight']
-
-    dist += graph[permutation[m - 1]][permutation[n]]['weight']
-    dist += graph[permutation[n]][permutation[(m + 1) % len(permutation)]]['weight']
-
-    dist += graph[permutation[n - 1]][permutation[m]]['weight']
-    dist += graph[permutation[m]][permutation[(n + 1) % len(permutation)]]['weight']
-
-    return dist
+# def find(graph, permutation):
+#     tabu_structure = {}
+#
+#     for i in range(0, graph.number_of_nodes()):
+#         for j in range(i + 1, graph.number_of_nodes()):
+#             current_object_value = inversion(permutation, i, j)
+#             current_solution = calc_dist(graph, current_object_value)
+#             tabu_structure[str(current_object_value)] = current_solution
+#
+#     tmp = {k: v for k, v in sorted(tabu_structure.items(), key=lambda item: item[1])}
+#     return tmp
 
 
-def find(graph, permutation):
-    tabu_structure = {}
-
-    for i in range(0, graph.number_of_nodes()):
-        for j in range(i + 1, graph.number_of_nodes()):
-            current_object_value = inversion(permutation, i, j)
-            current_solution = calc_dist(graph, current_object_value)
-            tabu_structure[str(current_object_value)] = current_solution
-
-    tmp = {k: v for k, v in sorted(tabu_structure.items(), key=lambda item: item[1])}
-    return tmp
-
-
-def find_neighbour_min(graph, permutation, tabu_list):
+def find_neighbour_min(graph, permutation, tabu_list, neighbourhood_type):
+    new_solution = permutation
     new_current_solution_cost = sys.maxsize
     current_i = 0
     current_j = 0
@@ -140,6 +105,7 @@ def tabu_search(permutation, graph, number_of_iterations, tabu_size, neighbourho
     tabu_list = list()
     best_cost = calc_dist(graph, permutation)
     best_solution_ever = solution
+    best_solution_step = count
 
     while count <= number_of_iterations:
         if neighbourhood_type == "swap":
@@ -160,7 +126,7 @@ def tabu_search(permutation, graph, number_of_iterations, tabu_size, neighbourho
                 best_cost = new_current_solution_cost
         else:
             current_i, current_j = tabu_list[-1][0], tabu_list[-1][1]
-            solution = swap_move(solution, current_i, current_j)
+            solution[current_i], solution[current_j] = solution[current_j], solution[current_i]
         count += 1
     # while count <= number_of_iterations:
     #     neighborhood = find(graph, solution)
