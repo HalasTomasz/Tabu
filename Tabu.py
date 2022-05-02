@@ -1,6 +1,8 @@
 import ast
 import sys
-
+import random
+import numpy as np
+import copy 
 
 def calc_dist(graph, permutation):
     dis = 0
@@ -45,7 +47,7 @@ def find_neighbour_min(graph, permutation, tabu_list, neighbourhood_type):
         for j in range(i + 1, graph.number_of_nodes()):
             permutation = neighbourhood_type(permutation, i, j)
             current_solution_cost = calc_dist(graph, permutation)
-            permutation = neighbourhood_type(permutation, j, i)
+            permutation = neighbourhood_type(permutation, j, i) ## Odkrecasz swapa ?
             if current_solution_cost < new_current_solution_cost and {i, j} not in tabu_list:
                 new_solution = permutation
                 new_current_solution_cost = current_solution_cost
@@ -54,6 +56,24 @@ def find_neighbour_min(graph, permutation, tabu_list, neighbourhood_type):
 
     return new_solution, new_current_solution_cost, current_i, current_j
 
+def find_neighbour_min_random(graph, permutation, tabu_list, neighbourhood_type):
+    new_solution = copy.copy(permutation)
+    new_current_solution_cost = sys.maxsize
+    current_i = 0
+    current_j = 0
+
+    for i in range(0, graph.number_of_nodes()):
+        for j in range(i + 1, graph.number_of_nodes()):
+            permutation = neighbourhood_type(permutation, i, j)
+            current_solution_cost = calc_dist(graph, permutation)
+            if current_solution_cost < new_current_solution_cost and (permutation not in tabu_list):
+                new_solution = copy.copy(permutation)
+                new_current_solution_cost = current_solution_cost
+                current_i = i
+                current_j = j
+            permutation = neighbourhood_type(permutation, j, i)
+                
+    return new_solution, new_current_solution_cost, current_i, current_j
 
 def tabu_search(permutation, graph, number_of_iterations, tabu_size, neighbourhood_type, n_opt=1):
     count = 1
@@ -132,4 +152,43 @@ def tabu_search(permutation, graph, number_of_iterations, tabu_size, neighbourho
     #
     #     count += 1
 
+    return best_solution_ever, best_cost
+
+
+def tabu_search_random(permutation, graph, number_of_iterations, tabu_size, neighbourhood_type, n_opt=1):
+    
+    count = 1
+    solution = permutation
+    tabu_list = list()
+    best_cost = calc_dist(graph, permutation)
+    best_solution_ever = solution
+    best_solution_step = count
+
+    while count <= number_of_iterations:
+    
+        if neighbourhood_type == "swap":
+            solution, new_current_solution_cost, _, _ = find_neighbour_min_random(graph, solution, tabu_list, swap)
+        elif neighbourhood_type == "invert":
+            solution, new_current_solution_cost, _, _ = find_neighbour_min_random(graph, solution, tabu_list,inversion)
+        
+        print(new_current_solution_cost)
+        #print(count, ": ", new_current_solution_cost)
+
+        if new_current_solution_cost != sys.maxsize:
+            #print(count, ": ", calc_dist(graph, solution))
+            
+            tabu_list.append(solution)
+            
+            if len(tabu_list) > tabu_size:
+                tabu_list.pop(0)
+                
+            if new_current_solution_cost < best_cost:
+                best_solution_ever = solution
+                best_cost = new_current_solution_cost
+        else:
+            
+            random.shuffle(solution)
+            
+        count += 1
+   
     return best_solution_ever, best_cost
