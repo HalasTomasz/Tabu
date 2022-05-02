@@ -37,7 +37,7 @@ if __name__ == '__main__':
     print(start)
     #print(Tabu.tabu_search(start, graph, 1000, 10, "swap"))
     print(start)
-    print(Tabu.tabu_search_random(copy.copy(start), graph, 50, 10, "swap"))
+    print(Tabu.tabu_search_random(copy.deepcopy(start), graph, 50, 10, "swap"))
     print(start)
     #print(Tabu.tabu_search(start, graph, math.pow(len(start), 2), len(start)))
 
