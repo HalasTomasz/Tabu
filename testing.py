@@ -134,13 +134,14 @@ dic to save data to JSON
 """
 
 
-def DataGraph(Type, func, t, solution, permutation, tabu, opt):
+def DataGraph(Type, func, t, solution, permutation, tabu, n,opt):
     Dic = {
         'Type': Type,
         'function': func,
         'time': t,
         'solution': solution,
         'size_of tabu': tabu,
+        'size_of_graph': n,
         'optimal_solution': opt
         # 'memory'
 
@@ -156,13 +157,13 @@ tests on auto generated graph
 
 
 def test_auto_generate(seed=100, neighbourhood_type="invert"):
-    types = ['sym', 'asym', 'full' 'eu']
+    types = ['sym', 'asym', 'full', 'eu']
     collection = []
-    size_of_tabu_table = [10, 50, 100, 200] # 500 and 10000
+    size_of_tabu_table = [10, 50, 100, 200,500,1000] # 500 and 10000
 
-    for i in range(1): # 10
+    for i in range(5): # 10
 
-        for n in range(10, 100, 20): # 300 
+        for n in range(10, 300, 20): # 300 
 
             for graph_type in types:
 
@@ -183,13 +184,13 @@ def test_auto_generate(seed=100, neighbourhood_type="invert"):
                     end = time.process_time()
 
                     collection.append(
-                        DataGraph(graph_type, 'tabu_ex_inv', end - start, cost, str(permutation), size, "None"))
+                        DataGraph(graph_type, 'tabu_ex_inv', end - start, cost, str(permutation), size, n , "None"))
 
                     """
                     EXTENDED TABU SEARCH WITH SWAP
                     """
 
-                    graph = function_module.generate_graph(n, seed, graph_type)  # Create graph
+                   # graph = function_module.generate_graph(n, seed, graph_type)  # Create graph
 
                     starting_permutation = function_module.extended_nearest_neighbour(graph)[0]  # Staring Permutation
 
@@ -201,7 +202,7 @@ def test_auto_generate(seed=100, neighbourhood_type="invert"):
                     end = time.process_time()
 
                     collection.append(
-                        DataGraph(graph_type, 'tabu_ex_swap', end - start, cost, str(permutation), size, "None"))
+                        DataGraph(graph_type, 'tabu_ex_swap', end - start, cost, str(permutation), size, n,"None"))
 
                     """
                     OPT2 [1,2,3....n] TABU SEARCH WITH INV/SWAP
@@ -219,8 +220,8 @@ def test_auto_generate(seed=100, neighbourhood_type="invert"):
                     end = time.process_time()
 
                     collection.append(
-                        DataGraph(graph_type, 'tabu_opt_inv' + neighbourhood_type, end - start, cost,str(permutation),
-                                  size, "None"))
+                        DataGraph(graph_type, 'tabu_opt_' + neighbourhood_type, end - start, cost,str(permutation),
+                                  size,n, "None"))
 
 
                     """
@@ -240,19 +241,25 @@ def test_auto_generate(seed=100, neighbourhood_type="invert"):
                     end = time.process_time()
 
                     collection.append(
-                        DataGraph(graph_type, 'tabu_opt_inv' + neighbourhood_type, end - start, cost, str(permutation),
-                                  size, "None"))
+                        DataGraph(graph_type, 'tabu_opt_r_' + neighbourhood_type, end - start, cost, str(permutation),
+                                  size, n,"None"))
 
                     """
                     My random tabu search
                     """
-                    start = function_module.extended_nearest_neighbour(graph)[0]
-                    permutation, cost  = Tabu.tabu_search_random(copy.copy(start), graph, size, len(starting_permutation),
-                                                         neighbourhood_type)
+                    starting = function_module.extended_nearest_neighbour(graph)[0]
                     
-
+                    start = time.process_time()
+                    
+                    permutation, cost  = Tabu.tabu_search_random(copy.copy(starting), graph, size, len(starting_permutation),
+                                                         neighbourhood_type)
+                    end = time.process_time()
+                    collection.append(
+                        DataGraph(graph_type, 'tabu_r_' + neighbourhood_type, end - start, cost, str(permutation), size, n,"None"))
+                    
+            print("finish " + str(n) )
     try:
-        file = open("First_test_gen", "w")
+        file = open("Second_test_gen", "w")
         json.dump(collection, file, indent=3)
     except IOError:
         pass
