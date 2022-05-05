@@ -7,6 +7,8 @@ import Tabu
 import copy
 import tsplib95
 import time
+
+import plots
 import testing
 import plotting
 
@@ -47,5 +49,6 @@ if __name__ == '__main__':
     # Create random using OPT2
     # """
     # start,_ = function_module.OPT2(graph)
-    # testing.test_auto_generate()
-    plotting.plotting("Second_test_gen.json")
+    # testing.test("C:/Users/szyme/PycharmProjects/Tabu/Data_Meta", "invert")
+
+    plots.count_spec()
