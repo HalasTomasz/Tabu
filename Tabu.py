@@ -194,8 +194,8 @@ def tabu_search_random(permutation, graph, number_of_iterations, tabu_size, neig
         elif neighbourhood_type == "invert":
             solution, new_current_solution_cost, _, _ = find_neighbour_min_random(graph, solution, tabu_list, inversion)
 
-        print(solution)
-        print(count, ": ", new_current_solution_cost)
+        # print(solution)
+        # print(count, ": ", new_current_solution_cost)
 
         if new_current_solution_cost != sys.maxsize:
             # print(count, ": ", calc_dist(graph, solution))
